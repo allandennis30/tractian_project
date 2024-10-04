@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:project_tractian/pages/home_page/home_page_controller.dart';
+import 'package:project_tractian/routes/app_navigator.dart';
 import 'package:project_tractian/theme/tractian_colors.dart';
 import 'package:project_tractian/widgets/shared/tractian_button.dart';
 import 'package:project_tractian/widgets/shared/tractian_scaffold.dart';
@@ -29,7 +30,10 @@ class HomePage extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         child: TractianButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            AppNavigator.openTreePage(
+                                enterpriseModel: controller.enterprises[index]);
+                          },
                           label: enterprise.name,
                           buttonType: ButtonType.large,
                           backgroundColor: TractianColor.primaryBlue,

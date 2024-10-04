@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:project_tractian/models/enterprise_model.dart';
-import 'package:project_tractian/repositories/enterprise_repositorie.dart';
+import 'package:project_tractian/repositories/general_repositorie.dart';
 
 class HomePageController extends GetxController {
-  EnterpriseRepository enterpriseRepository = EnterpriseRepository();
+  GeneralRepository generalRepository = GeneralRepository();
   var enterprises = <EnterpriseModel>[].obs;
 
   @override
@@ -13,7 +13,7 @@ class HomePageController extends GetxController {
   }
 
   void getEnterprisesfromRepository() async {
-    var fetchedEnterprises = await enterpriseRepository.getEnterprise();
+    var fetchedEnterprises = await generalRepository.getEnterprise();
     enterprises.value = fetchedEnterprises;
   }
 }
