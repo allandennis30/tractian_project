@@ -12,6 +12,7 @@ class TreePage extends StatelessWidget {
       init: TreePageController(),
       builder: (controller) {
         return TractianScaffold(
+          showFilter: true,
           appBarTitle: 'Assets',
           body: Obx(() {
             if (controller.locations.isEmpty) {

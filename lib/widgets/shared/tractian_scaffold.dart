@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:project_tractian/theme/tractian_colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project_tractian/widgets/shared/tractian_search_bar_filter.dart';
 
 class TractianScaffold extends StatelessWidget {
   const TractianScaffold({
     super.key,
     this.appBarTitle,
-    this.appBarLogo,
+    this.appBarLogoPath,
     this.body,
+    this.showFilter = false,
   });
 
   final String? appBarTitle;
-  final Image? appBarLogo;
+  final String? appBarLogoPath;
   final Widget? body;
+  final bool showFilter;
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +24,12 @@ class TractianScaffold extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: TractianColor.secondaryBlue,
         automaticallyImplyLeading: false,
-        title: appBarLogo != null
+        title: appBarLogoPath != null
             ? Center(
-                child: appBarLogo,
+                child: SvgPicture.asset(
+                  appBarLogoPath!,
+                  height: 18,
+                ),
               )
             : Stack(
                 alignment: Alignment.centerLeft,
@@ -46,7 +53,20 @@ class TractianScaffold extends StatelessWidget {
                 ],
               ),
       ),
-      body: body,
+      body: Column(
+        children: [
+          if (showFilter)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TractianSearchBarFilter(
+                onChanged: (value) {
+                  print("Texto de pesquisa: $value");
+                },
+              ),
+            ),
+          Expanded(child: body ?? Container()),
+        ],
+      ),
     );
   }
 }

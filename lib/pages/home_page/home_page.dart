@@ -15,8 +15,7 @@ class HomePage extends StatelessWidget {
         init: HomePageController(),
         builder: (controller) {
           return TractianScaffold(
-            appBarLogo: Image.asset('assets/logo/LOGO_TRACTIAN.png',
-                alignment: Alignment.center),
+            appBarLogoPath: 'assets/logo/logo.svg',
             body: Padding(
               padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 22),
               child: Obx(() {
@@ -38,7 +37,7 @@ class HomePage extends StatelessWidget {
                           buttonType: ButtonType.large,
                           backgroundColor: TractianColor.primaryBlue,
                           textColor: TractianColor.white,
-                          iconPath: 'assets/icons/boxes.svg',
+                          centerIconPath: 'assets/icons/boxes.svg',
                         ),
                       );
                     },
