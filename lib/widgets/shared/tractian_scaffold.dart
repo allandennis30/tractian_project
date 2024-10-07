@@ -8,13 +8,13 @@ class TractianScaffold extends StatelessWidget {
     super.key,
     this.appBarTitle,
     this.appBarLogoPath,
-    this.body,
+    required this.body,
     this.showFilter = false,
   });
 
   final String? appBarTitle;
   final String? appBarLogoPath;
-  final Widget? body;
+  final Widget body;
   final bool showFilter;
 
   @override
@@ -57,14 +57,14 @@ class TractianScaffold extends StatelessWidget {
         children: [
           if (showFilter)
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               child: TractianSearchBarFilter(
                 onChanged: (value) {
                   print("Texto de pesquisa: $value");
                 },
               ),
             ),
-          Expanded(child: body ?? Container()),
+          Expanded(child: body),
         ],
       ),
     );

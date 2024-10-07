@@ -65,7 +65,7 @@ class TractianButtonState extends State<TractianButton> {
       }
 
       Color borderColor =
-          isSelected.value ? TractianColor.primaryBlue : TractianColor.gray;
+          isSelected.value ? TractianColor.primaryBlue : TractianColor.gray200;
 
       return SizedBox(
         height: height,
@@ -78,10 +78,12 @@ class TractianButtonState extends State<TractianButton> {
             backgroundColor: buttonColor,
             elevation: 0,
             textStyle: TextStyle(
-              fontSize: widget.buttonType == ButtonType.large ? 18.0 : 14.0,
-            ),
+                fontSize: widget.buttonType == ButtonType.large ? 18.0 : 14.0,
+                fontWeight: widget.buttonType == ButtonType.large
+                    ? FontWeight.normal
+                    : FontWeight.bold),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(3),
               side: BorderSide(
                 color: borderColor,
                 width: 1,

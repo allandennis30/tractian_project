@@ -6,8 +6,8 @@ import '../../repositories/general_repositorie.dart';
 
 class TreePageController extends GetxController {
   GeneralRepository generalRepository = GeneralRepository();
-  var locations = <LocationModel>[].obs;
   late EnterpriseModel enterpriseModel;
+  var locationsByParent = <String?, List<LocationModel>>{}.obs;
 
   @override
   void onInit() {
@@ -19,6 +19,14 @@ class TreePageController extends GetxController {
   void getLocationsFromRepository() async {
     var fetchedLocations =
         await generalRepository.getLocations(enterpriseModel.id);
-    locations.value = fetchedLocations;
+
+    Map<String?, List<LocationModel>> groupedLocations = {};
+    for (var location in fetchedLocations) {
+      groupedLocations[location.id] = [location];
+      if (groupedLocations.containsKey(location.id)) {
+        groupedLocations[location.parentId]!.add(location);
+      }
+    }
+    locationsByParent.value = groupedLocations;
   }
 }

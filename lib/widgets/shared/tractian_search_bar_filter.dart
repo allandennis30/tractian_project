@@ -19,12 +19,7 @@ class TractianSearchBarFilter extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          margin: const EdgeInsets.only(
-            top: 12,
-            left: 10,
-            right: 10,
-          ),
+          height: 32,
           decoration: BoxDecoration(
             color: backgroundColor,
             borderRadius: BorderRadius.circular(5),
@@ -33,14 +28,28 @@ class TractianSearchBarFilter extends StatelessWidget {
             onChanged: onChanged,
             decoration: InputDecoration(
               hintStyle: const TextStyle(
-                  color: TractianColor.gray500, fontFamily: 'Roboto'),
+                color: TractianColor.gray500,
+                fontFamily: 'Roboto',
+              ),
               hintText: hintText,
               border: InputBorder.none,
-              icon: const Icon(Icons.search, color: TractianColor.gray500),
+              icon: const Padding(
+                padding: EdgeInsets.only(
+                  left: 18,
+                ),
+                child: Icon(
+                  Icons.search,
+                  color: TractianColor.gray500,
+                  size: 18,
+                  applyTextScaling: false,
+                ),
+              ),
             ),
           ),
         ),
+        const SizedBox(height: 8),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TractianButton(
               leftIconPath: 'assets/logo/energy.svg',
@@ -49,16 +58,15 @@ class TractianSearchBarFilter extends StatelessWidget {
               label: 'Sensor de Energia',
               isToggle: true,
               backgroundColor: Colors.red,
-              textColor: TractianColor.primaryBlue,
             ),
+            const SizedBox(width: 8),
             TractianButton(
               leftIconPath: 'assets/logo/info.svg',
               buttonType: ButtonType.small,
               onPressed: () {},
-              label: 'Sensor de Energia',
+              label: 'Crítico',
               isToggle: true,
               backgroundColor: Colors.red,
-              textColor: TractianColor.primaryBlue,
             ),
           ],
         )
