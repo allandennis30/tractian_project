@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:project_tractian/models/asset_model.dart';
 import 'package:project_tractian/models/location_model.dart';
 import 'dart:developer';
 
@@ -9,6 +10,7 @@ class GeneralRepository {
 
   Future<List<EnterpriseModel>> getEnterprise() async {
     List<EnterpriseModel> enterprises = [];
+
     try {
       String url = 'http://fake-api.tractian.com/companies';
       final response = await dio.get(url);
@@ -44,5 +46,24 @@ class GeneralRepository {
       log('Erro ao buscar empresas: $e');
     }
     return locations;
+  }
+
+  Future<List<AssetModel>> getAssets(String companyId) async {
+    List<AssetModel> assets = [];
+    try {
+      String url = 'http://fake-api.tractian.com/companies/$companyId/assets';
+      final response = await dio.get(url);
+
+      if (response.statusCode == 200) {
+        assets = (response.data as List)
+            .map((enterprise) => AssetModel.fromJson(enterprise))
+            .toList();
+      } else {
+        throw Exception('Erro ao buscar Locations: ${response.statusCode}');
+      }
+    } catch (e) {
+      log('Erro ao buscar assets: $e');
+    }
+    return assets;
   }
 }
