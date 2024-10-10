@@ -8,7 +8,7 @@ class TreePage extends StatelessWidget {
   const TreePage({super.key});
 
   @override
-  build(BuildContext context) {
+  Widget build(BuildContext context) {
     return GetBuilder<TreePageController>(
       init: TreePageController(),
       builder: (controller) {
@@ -28,6 +28,9 @@ class TreePage extends StatelessWidget {
                 bool hasChildren = controller
                         .hierarchyMap[item.id]?['subLocations']?.isNotEmpty ??
                     false;
+                bool hasAssets =
+                    controller.hierarchyMap[item.id]?['assets']?.isNotEmpty ??
+                        false;
 
                 bool isChild = item.parentId != null;
 
@@ -36,7 +39,7 @@ class TreePage extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        if (hasChildren) {
+                        if (hasChildren || hasAssets) {
                           controller.toggleChildrenVisibility(item.id);
                         }
                       },
@@ -47,30 +50,43 @@ class TreePage extends StatelessWidget {
                       ),
                     ),
                     Obx(() {
-                      // Mostra os filhos se a visibilidade estiver ativa
                       if (controller.isChildrenVisible(item.id)) {
                         final children = controller.hierarchyMap[item.id]
                                 ?['subLocations'] ??
                             [];
+                        final assets =
+                            controller.hierarchyMap[item.id]?['assets'] ?? [];
                         return Column(
-                          children: children.map<Widget>((child) {
-                            final int childDepth = depth + 1;
-                            return GestureDetector(
-                              onTap: () {
-                                if (controller
-                                        .hierarchyMap[child.id]?['subLocations']
-                                        ?.isNotEmpty ??
-                                    false) {
-                                  controller.toggleChildrenVisibility(child.id);
-                                }
-                              },
-                              child: TractianTile(
-                                title: child.name,
+                          children: [
+                            ...children.map<Widget>((child) {
+                              final int childDepth = depth + 1;
+                              return GestureDetector(
+                                onTap: () {
+                                  if (controller
+                                          .hierarchyMap[child.id]
+                                              ?['subLocations']
+                                          ?.isNotEmpty ??
+                                      false) {
+                                    controller
+                                        .toggleChildrenVisibility(child.id);
+                                  }
+                                },
+                                child: TractianTile(
+                                  title: child.name,
+                                  isChild: true,
+                                  depth: childDepth,
+                                ),
+                              );
+                            }).toList(),
+                            ...assets.map<Widget>((asset) {
+                              final int assetDepth = depth + 1;
+                              return TractianTile(
+                                title: asset.name,
                                 isChild: true,
-                                depth: childDepth,
-                              ),
-                            );
-                          }).toList(),
+                                depth: assetDepth,
+                              );
+                            }).toList(),
+                          ],
                         );
                       }
                       return Container();

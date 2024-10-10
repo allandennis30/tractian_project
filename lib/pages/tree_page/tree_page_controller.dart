@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:get/get.dart';
 import 'package:project_tractian/models/enterprise_model.dart';
 import '../../repositories/general_repositorie.dart';
@@ -24,10 +22,8 @@ class TreePageController extends GetxController {
     var fetchedLocations =
         await generalRepository.getLocations(enterpriseModel.id);
     var fetchedAssets = await generalRepository.getAssets(enterpriseModel.id);
-    for (var asset in fetchedAssets) {
-      assetsIndex[asset.id] = asset;
-      log(assetsIndex.toString());
-    }
+
+    // Processa localizações
     for (var location in fetchedLocations) {
       if (location.parentId == null) {
         hierarchyMap.putIfAbsent(
@@ -46,8 +42,21 @@ class TreePageController extends GetxController {
           hierarchyMap[location.parentId] = {
             'location': null,
             'subLocations': [location],
+            'assets': [],
           };
         }
+      }
+    }
+
+    for (var asset in fetchedAssets) {
+      if (hierarchyMap.containsKey(asset.locationId)) {
+        hierarchyMap[asset.locationId]!['assets'].add(asset);
+      } else {
+        hierarchyMap[asset.locationId] = {
+          'location': null,
+          'subLocations': [],
+          'assets': [asset],
+        };
       }
     }
   }
@@ -70,18 +79,15 @@ class TreePageController extends GetxController {
     int depth = 0;
     var currentItem = item;
 
-    /*  while (currentItem.parentId != null) {
+    while (currentItem.parentId != null) {
       depth++;
-      // Acessa o mapa correspondente no hierarchyMap
       var parentData = hierarchyMap[currentItem.parentId];
       if (parentData != null) {
-        // Obtém o 'location' do pai
         currentItem = parentData['location'];
       } else {
-        // Se não houver dados do pai, sai do loop
         break;
       }
-    } */
+    }
 
     return depth;
   }
