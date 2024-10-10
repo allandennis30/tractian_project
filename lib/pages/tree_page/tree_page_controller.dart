@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:project_tractian/models/enterprise_model.dart';
 import '../../repositories/general_repositorie.dart';
@@ -6,10 +8,10 @@ class TreePageController extends GetxController {
   GeneralRepository generalRepository = GeneralRepository();
   late EnterpriseModel enterpriseModel;
 
-  var hierarchyMap = <String?, List<dynamic>>{}.obs;
-  var locationMap = <String?, List<dynamic>>{}.obs;
-  var orderedLocations = <dynamic>[].obs;
+  var hierarchyMap = <String?, Map<String, dynamic>>{}.obs;
   var childrenVisibilityMap = <String, bool>{}.obs;
+  var orderedItems = <dynamic>[].obs;
+  var assetsIndex = {}.obs;
 
   @override
   void onInit() {
@@ -18,8 +20,40 @@ class TreePageController extends GetxController {
     fetchData();
   }
 
+  Future<void> getLocationsAndAssets() async {
+    var fetchedLocations =
+        await generalRepository.getLocations(enterpriseModel.id);
+    var fetchedAssets = await generalRepository.getAssets(enterpriseModel.id);
+    for (var asset in fetchedAssets) {
+      assetsIndex[asset.id] = asset;
+      log(assetsIndex.toString());
+    }
+    for (var location in fetchedLocations) {
+      if (location.parentId == null) {
+        hierarchyMap.putIfAbsent(
+          location.id,
+          () => {
+            'location': location,
+            'subLocations': [],
+            'assets': [],
+          },
+        );
+        orderedItems.add(location);
+      } else {
+        if (hierarchyMap.containsKey(location.parentId)) {
+          hierarchyMap[location.parentId]!['subLocations'].add(location);
+        } else {
+          hierarchyMap[location.parentId] = {
+            'location': null,
+            'subLocations': [location],
+          };
+        }
+      }
+    }
+  }
+
   void fetchData() async {
-    await getLocationsFromRepository();
+    await getLocationsAndAssets();
   }
 
   void toggleChildrenVisibility(String? parentId) {
@@ -32,86 +66,23 @@ class TreePageController extends GetxController {
     return childrenVisibilityMap[parentId] ?? false;
   }
 
-  Future<void> getLocationsFromRepository() async {
-    var fetchedLocations =
-        await generalRepository.getLocations(enterpriseModel.id);
+  int calculateDepth(dynamic item) {
+    int depth = 0;
+    var currentItem = item;
 
-    fetchedLocations.sort((a, b) {
-      if (a.parentId == null) return -1;
-      if (b.parentId == null) return 1;
-      return 0;
-    });
-
-    for (var location in fetchedLocations) {
-      locationMap[location.id] = [location];
-
-      orderedLocations.add(location);
-
-      if (location.parentId != null && location.parentId != location.id) {
-        locationMap[location.parentId] = locationMap[location.parentId] ?? [];
-        locationMap[location.parentId]!.add(location);
+    /*  while (currentItem.parentId != null) {
+      depth++;
+      // Acessa o mapa correspondente no hierarchyMap
+      var parentData = hierarchyMap[currentItem.parentId];
+      if (parentData != null) {
+        // Obtém o 'location' do pai
+        currentItem = parentData['location'];
+      } else {
+        // Se não houver dados do pai, sai do loop
+        break;
       }
-    }
-  }
+    } */
 
-  Future<void> getAssets() async {
-    var fetchedAssets = await generalRepository.getAssets(enterpriseModel.id);
-
-    for (var asset in fetchedAssets) {
-      hierarchyMap[asset.id] = [asset];
-
-      if (asset.parentId != null) {
-        hierarchyMap[asset.parentId] = hierarchyMap[asset.parentId] ?? [];
-        hierarchyMap[asset.parentId]!.add(asset);
-      }
-    }
+    return depth;
   }
 }
-
-
-/* import 'package:get/get.dart';
-import 'package:project_tractian/models/asset_model.dart';
-import 'package:project_tractian/models/enterprise_model.dart';
-import 'package:project_tractian/models/location_model.dart';
-
-import '../../repositories/general_repositorie.dart';
-
-class TreePageController extends GetxController {
-  GeneralRepository generalRepository = GeneralRepository();
-  late EnterpriseModel enterpriseModel;
-  var locationsByParent = <String?, List<LocationModel>>{}.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    enterpriseModel = Get.arguments as EnterpriseModel;
-    getLocationsFromRepository();
-    getAssets();
-  }
-
-  void getLocationsFromRepository() async {
-    var fetchedLocations =
-        await generalRepository.getLocations(enterpriseModel.id);
-
-    Map<String?, List<LocationModel>> groupedLocations = {};
-    for (var location in fetchedLocations) {
-      groupedLocations[location.id] = [location];
-      if (groupedLocations.containsKey(location.parentId)) {
-        groupedLocations[location.parentId]!.add(location);
-      }
-    }
-    locationsByParent.value = groupedLocations;
-  }
-
-  void getAssets() async {
-    var fetchedAssets = await generalRepository.getAssets(enterpriseModel.id);
-    Map<String?, List<AssetModel>> groupedAssets = {};
-    for (var asset in fetchedAssets) {
-      groupedAssets[asset.id] = [asset];
-      if (groupedAssets.containsKey(asset.parentId)) {
-        groupedAssets[asset.parentId]!.add(asset);
-      }
-    }
-  }
-}
- */

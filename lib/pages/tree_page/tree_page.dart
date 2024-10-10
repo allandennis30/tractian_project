@@ -8,7 +8,7 @@ class TreePage extends StatelessWidget {
   const TreePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) {
     return GetBuilder<TreePageController>(
       init: TreePageController(),
       builder: (controller) {
@@ -16,20 +16,23 @@ class TreePage extends StatelessWidget {
           showFilter: true,
           appBarTitle: 'Assets',
           body: Obx(() {
-            if (controller.orderedLocations.isEmpty) {
+            if (controller.orderedItems.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
-
             return ListView.builder(
-              itemCount: controller.orderedLocations.length,
+              itemCount: controller.orderedItems.length,
               itemBuilder: (context, index) {
-                final item = controller.orderedLocations[index];
+                final item = controller.orderedItems[index];
+                final int depth = controller.calculateDepth(item);
 
-                bool hasChildren =
-                    (controller.locationMap[item.id] ?? []).isNotEmpty;
+                bool hasChildren = controller
+                        .hierarchyMap[item.id]?['subLocations']?.isNotEmpty ??
+                    false;
+
                 bool isChild = item.parentId != null;
 
                 return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -40,16 +43,32 @@ class TreePage extends StatelessWidget {
                       child: TractianTile(
                         title: item.name,
                         isChild: isChild,
+                        depth: depth,
                       ),
                     ),
                     Obx(() {
+                      // Mostra os filhos se a visibilidade estiver ativa
                       if (controller.isChildrenVisible(item.id)) {
-                        final children = controller.locationMap[item.id] ?? [];
+                        final children = controller.hierarchyMap[item.id]
+                                ?['subLocations'] ??
+                            [];
                         return Column(
                           children: children.map<Widget>((child) {
-                            return TractianTile(
-                              title: child.name,
-                              isChild: true,
+                            final int childDepth = depth + 1;
+                            return GestureDetector(
+                              onTap: () {
+                                if (controller
+                                        .hierarchyMap[child.id]?['subLocations']
+                                        ?.isNotEmpty ??
+                                    false) {
+                                  controller.toggleChildrenVisibility(child.id);
+                                }
+                              },
+                              child: TractianTile(
+                                title: child.name,
+                                isChild: true,
+                                depth: childDepth,
+                              ),
                             );
                           }).toList(),
                         );
