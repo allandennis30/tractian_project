@@ -16,21 +16,21 @@ class TreePage extends StatelessWidget {
           showFilter: true,
           appBarTitle: 'Assets',
           body: Obx(() {
-            if (controller.orderedItems.isEmpty) {
+            if (controller.hierarchyMap.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
             return ListView.builder(
-              itemCount: controller.orderedItems.length,
+              itemCount: controller.hierarchyMap.length,
               itemBuilder: (context, index) {
-                final item = controller.orderedItems[index];
-                final int depth = controller.calculateDepth(item);
-
-                bool hasChildren = controller
-                        .hierarchyMap[item.id]?['subLocations']?.isNotEmpty ??
-                    false;
-                bool hasAssets =
-                    controller.hierarchyMap[item.id]?['assets']?.isNotEmpty ??
+                final item = controller.hierarchyMap[index];
+                final int depth = controller.calculateDepth(item!);
+                bool hasChildren =
+                    controller.hierarchyMap[item.id]?.children?.isNotEmpty ??
                         false;
+
+                bool hasAssets = controller.hierarchyMap[item.id]?.children!
+                        .any((child) => child.isAsset) ??
+                    false;
 
                 bool isChild = item.parentId != null;
 
@@ -51,45 +51,35 @@ class TreePage extends StatelessWidget {
                     ),
                     Obx(() {
                       if (controller.isChildrenVisible(item.id)) {
-                        final children = controller.hierarchyMap[item.id]
-                                ?['subLocations'] ??
-                            [];
-                        final assets =
-                            controller.hierarchyMap[item.id]?['assets'] ?? [];
+                        // Obtenha todos os filhos (tanto subLocalizações quanto ativos)
+                        final children =
+                            controller.hierarchyMap[item.id]?.children ?? [];
+
                         return Column(
-                          children: [
-                            ...children.map<Widget>((child) {
-                              final int childDepth = depth + 1;
-                              return GestureDetector(
-                                onTap: () {
-                                  if (controller
-                                          .hierarchyMap[child.id]
-                                              ?['subLocations']
-                                          ?.isNotEmpty ??
-                                      false) {
-                                    controller
-                                        .toggleChildrenVisibility(child.id);
-                                  }
-                                },
-                                child: TractianTile(
-                                  title: child.name,
-                                  isChild: true,
-                                  depth: childDepth,
-                                ),
-                              );
-                            }).toList(),
-                            ...assets.map<Widget>((asset) {
-                              final int assetDepth = depth + 1;
-                              return TractianTile(
-                                title: asset.name,
+                          children: children.map<Widget>((child) {
+                            final int childDepth = depth + 1;
+
+                            // Verifica se o nó filho tem mais filhos
+                            bool hasChildren =
+                                child.children?.isNotEmpty ?? false;
+
+                            return GestureDetector(
+                              onTap: () {
+                                if (hasChildren) {
+                                  controller.toggleChildrenVisibility(child.id);
+                                }
+                              },
+                              child: TractianTile(
+                                title: child.name,
                                 isChild: true,
-                                depth: assetDepth,
-                              );
-                            }).toList(),
-                          ],
+                                depth: childDepth,
+                              ),
+                            );
+                          }).toList(),
                         );
                       }
-                      return Container();
+                      return const SizedBox
+                          .shrink(); // Evita retornar um Container vazio
                     }),
                   ],
                 );
