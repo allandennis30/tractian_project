@@ -19,53 +19,47 @@ class TreePage extends StatelessWidget {
             if (controller.hierarchyMap.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
+
+            final items = controller.hierarchyMap.values.toList();
+
             return ListView.builder(
-              itemCount: controller.hierarchyMap.length,
+              itemCount: items.length,
               itemBuilder: (context, index) {
-                final item = controller.hierarchyMap[index];
-                final int depth = controller.calculateDepth(item!);
-                bool hasChildren =
-                    controller.hierarchyMap[item.id]?.children?.isNotEmpty ??
-                        false;
-
-                bool hasAssets = controller.hierarchyMap[item.id]?.children!
-                        .any((child) => child.isAsset) ??
-                    false;
-
-                bool isChild = item.parentId != null;
+                final item = items[index];
+                bool hasChildren = item.children?.isNotEmpty ?? false;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
                       onTap: () {
-                        if (hasChildren || hasAssets) {
+                        if (hasChildren) {
                           controller.toggleChildrenVisibility(item.id);
                         }
                       },
                       child: TractianTile(
                         title: item.name,
-                        isChild: isChild,
-                        depth: depth,
+                        isChild: item.parentId != null,
+                        depth: item.depth,
                       ),
                     ),
                     Obx(() {
                       if (controller.isChildrenVisible(item.id)) {
-                        // Obtenha todos os filhos (tanto subLocalizações quanto ativos)
-                        final children =
-                            controller.hierarchyMap[item.id]?.children ?? [];
+                        final children = item.children ?? [];
 
-                        return Column(
-                          children: children.map<Widget>((child) {
-                            final int childDepth = depth + 1;
-
-                            // Verifica se o nó filho tem mais filhos
-                            bool hasChildren =
+                        return ListView.builder(
+                          itemCount: children.length,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, childIndex) {
+                            final child = children[childIndex];
+                            final int childDepth = item.depth + 1;
+                            bool childHasChildren =
                                 child.children?.isNotEmpty ?? false;
 
                             return GestureDetector(
                               onTap: () {
-                                if (hasChildren) {
+                                if (childHasChildren) {
                                   controller.toggleChildrenVisibility(child.id);
                                 }
                               },
@@ -75,11 +69,10 @@ class TreePage extends StatelessWidget {
                                 depth: childDepth,
                               ),
                             );
-                          }).toList(),
+                          },
                         );
                       }
-                      return const SizedBox
-                          .shrink(); // Evita retornar um Container vazio
+                      return const SizedBox.shrink();
                     }),
                   ],
                 );

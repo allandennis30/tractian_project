@@ -1,8 +1,6 @@
 import 'dart:developer';
 import 'package:get/get.dart';
-import 'package:project_tractian/models/asset_model.dart';
 import 'package:project_tractian/models/enterprise_model.dart';
-import 'package:project_tractian/models/location_model.dart';
 import '../../models/node_model.dart';
 import '../../repositories/general_repositorie.dart';
 
@@ -12,8 +10,7 @@ class TreePageController extends GetxController {
 
   var hierarchyMap = <String?, NodeModel>{}.obs;
   var childrenVisibilityMap = <String, bool>{}.obs;
-  var locationsIndex = <String, LocationModel>{}.obs;
-  var assetsIndex = <String, AssetModel>{}.obs;
+  var nodesIndex = <String, NodeModel>{}.obs;
 
   @override
   void onInit() {
@@ -28,68 +25,61 @@ class TreePageController extends GetxController {
     var fetchedAssets = await generalRepository.getAssets(enterpriseModel.id);
 
     for (var location in fetchedLocations) {
-      locationsIndex[location.id!] = location;
-    }
-
-    for (var asset in fetchedAssets) {
-      assetsIndex[asset.id] = asset;
-    }
-
-    for (var location in locationsIndex.values) {
-      var node = NodeModel(
+      final node = NodeModel(
         id: location.id,
         name: location.name,
         parentId: location.parentId,
         isAsset: false,
         children: [],
       );
-
-      if (location.parentId == null) {
-        hierarchyMap.putIfAbsent(location.id, () => node);
-      } else {
-        if (hierarchyMap.containsKey(location.parentId)) {
-          hierarchyMap[location.parentId]?.children!.add(node);
-        } else {
-          hierarchyMap.putIfAbsent(
-              location.parentId,
-              () => NodeModel(
-                    id: location.parentId,
-                    name: locationsIndex[location.parentId]!.name,
-                    parentId: null,
-                    isAsset: false,
-                    children: [node],
-                  ));
-        }
-      }
+      nodesIndex[location.id!] = node;
     }
 
     for (var asset in fetchedAssets) {
-      var node = NodeModel(
+      final node = NodeModel(
         id: asset.id,
         name: asset.name,
-        parentId: asset.parentId,
+        parentId: asset.parentId ?? asset.locationId,
         isAsset: true,
+        locationId: asset.locationId,
+        sensorType: asset.sensorType,
+        status: asset.status,
+        gatewayId: asset.gatewayId,
+        sensorId: asset.sensorId,
+        isComponent: asset.sensorType != null,
         children: [],
       );
-
-      if (asset.parentId != null && assetsIndex.containsKey(asset.parentId)) {
-        var parentAsset = assetsIndex[asset.parentId]!;
-
-        if (parentAsset.locationId != null &&
-            hierarchyMap.containsKey(parentAsset.locationId)) {
-          hierarchyMap[parentAsset.locationId]?.children!.add(node);
-        }
-      } else {
-        if (asset.locationId == null) {
-          hierarchyMap[asset.id] = node;
-        } else if (hierarchyMap.containsKey(asset.locationId) &&
-            hierarchyMap[asset.locationId] != null) {
-          hierarchyMap[asset.locationId]?.children!.add(node);
-        }
-      }
+      nodesIndex[asset.id] = node;
     }
 
-    log('complete');
+    for (final node in nodesIndex.values) {
+      addNodeToTreeBFS(node);
+    }
+
+    print('complete');
+  }
+
+  void addNodeToTreeBFS(NodeModel node) {
+    final parentId = node.parentId;
+    final hasParent = parentId != null;
+
+    if (!hasParent) {
+      hierarchyMap[node.id] = node;
+      return;
+    }
+
+    final parentNode = nodesIndex[parentId];
+
+    if (parentNode == null) return;
+
+    node.depth++;
+    for (final child in node.children!) {
+      child.depth++;
+    }
+
+    parentNode.children!.add(node);
+
+    addNodeToTreeBFS(parentNode);
   }
 
   void fetchData() async {
