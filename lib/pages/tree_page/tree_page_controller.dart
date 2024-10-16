@@ -88,21 +88,4 @@ class TreePageController extends GetxController {
   bool isChildrenVisible(String? parentId) {
     return childrenVisibilityMap[parentId] ?? false;
   }
-
-  int calculateDepth(NodeModel node) {
-    int depth = 0;
-    var currentItem = node;
-
-    while (currentItem.parentId != null) {
-      depth++;
-      var parentData = hierarchyMap[currentItem.parentId];
-      if (parentData != null) {
-        currentItem = parentData;
-      } else {
-        break;
-      }
-    }
-
-    return depth;
-  }
 }
