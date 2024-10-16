@@ -61,25 +61,18 @@ class TreePageController extends GetxController {
 
   void addNodeToTreeBFS(NodeModel node) {
     final parentId = node.parentId;
-    final hasParent = parentId != null;
 
-    if (!hasParent) {
+    if (parentId == null) {
       hierarchyMap[node.id] = node;
-      return;
+    } else {
+      final parentNode = nodesIndex[parentId];
+      if (parentNode != null) {
+        parentNode.children!.add(node);
+        node.depth = (parentNode.depth) + 1;
+      } else {
+        hierarchyMap[node.id] = node;
+      }
     }
-
-    final parentNode = nodesIndex[parentId];
-
-    if (parentNode == null) return;
-
-    node.depth++;
-    for (final child in node.children!) {
-      child.depth++;
-    }
-
-    parentNode.children!.add(node);
-
-    addNodeToTreeBFS(parentNode);
   }
 
   void fetchData() async {
