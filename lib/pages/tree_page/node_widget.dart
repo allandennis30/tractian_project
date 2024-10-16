@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../models/node_model.dart';
-import '../../widgets/shared/tractian_tile.dart';
+import 'tractian_tile.dart';
 import 'tree_page_controller.dart';
 
 class NodeWidget extends StatelessWidget {
@@ -25,9 +25,8 @@ class NodeWidget extends StatelessWidget {
             }
           },
           child: TractianTile(
-            title: node.name,
-            isChild: node.parentId != null,
-            depth: node.depth,
+            node: node,
+            parentController: controller,
           ),
         ),
         Obx(() {

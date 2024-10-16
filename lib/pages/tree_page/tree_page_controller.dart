@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:project_tractian/models/enterprise_model.dart';
 import '../../models/node_model.dart';
@@ -55,23 +54,29 @@ class TreePageController extends GetxController {
     for (final node in nodesIndex.values) {
       addNodeToTreeBFS(node);
     }
-
     print('complete');
   }
 
   void addNodeToTreeBFS(NodeModel node) {
     final parentId = node.parentId;
-
     if (parentId == null) {
       hierarchyMap[node.id] = node;
     } else {
       final parentNode = nodesIndex[parentId];
       if (parentNode != null) {
         parentNode.children!.add(node);
-        node.depth = (parentNode.depth) + 1;
+        node.depth = parentNode.depth + 1;
+        _adjustChildrenDepth(node);
       } else {
         hierarchyMap[node.id] = node;
       }
+    }
+  }
+
+  void _adjustChildrenDepth(NodeModel node) {
+    for (var child in node.children!) {
+      child.depth = node.depth + 1;
+      _adjustChildrenDepth(child);
     }
   }
 
