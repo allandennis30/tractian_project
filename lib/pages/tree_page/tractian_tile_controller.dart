@@ -9,25 +9,18 @@ class TractianTileController extends GetxController {
   final NodeModel node;
   final TreePageController parentController;
 
-  final isOpen = false.obs;
-  final isChild = false.obs;
   final hasChildren = false.obs;
+  final isImmediateChild = false.obs;
 
   TractianTileController({required this.node, required this.parentController}) {
-    isOpen.value = parentController.isChildrenVisible(node.parentId);
-    isChild.value = node.parentId != null;
-    hasChildren.value = node.children != null;
-
-    ever(isOpen, (value) {
-      log("isOpen mudou para: $value no nó com id: ${node.id}");
-    });
+    hasChildren.value = node.children != null && node.children!.isNotEmpty;
+    isImmediateChild.value = node.parentId != null &&
+        parentController.nodesIndex[node.parentId]?.parentId == null;
   }
 
-  bool get isRootOrChildOfRoot {
-    if (node.parentId == null) {
-      return true;
+  void toggleChildrenVisibility() {
+    if (hasChildren.value) {
+      parentController.toggleChildrenVisibility(node.id);
     }
-    final parentNode = parentController.nodesIndex[node.parentId];
-    return parentNode?.parentId == null;
   }
 }

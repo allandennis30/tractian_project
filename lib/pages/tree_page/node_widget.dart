@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../models/node_model.dart';
 import 'tractian_tile.dart';
 import 'tree_page_controller.dart';
