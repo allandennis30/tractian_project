@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 
 import '../../models/node_model.dart';
@@ -12,9 +14,13 @@ class TractianTileController extends GetxController {
   final hasChildren = false.obs;
 
   TractianTileController({required this.node, required this.parentController}) {
-    isOpen.value = parentController.isChildrenVisible(node.id);
+    isOpen.value = parentController.isChildrenVisible(node.parentId);
     isChild.value = node.parentId != null;
     hasChildren.value = node.children != null;
+
+    ever(isOpen, (value) {
+      log("isOpen mudou para: $value no nó com id: ${node.id}");
+    });
   }
 
   bool get isRootOrChildOfRoot {
@@ -23,12 +29,5 @@ class TractianTileController extends GetxController {
     }
     final parentNode = parentController.nodesIndex[node.parentId];
     return parentNode?.parentId == null;
-  }
-
-  void toggleChildrenVisibility() {
-    if (hasChildren.value) {
-      parentController.toggleChildrenVisibility(node.id);
-      isOpen.value = !isOpen.value;
-    }
   }
 }

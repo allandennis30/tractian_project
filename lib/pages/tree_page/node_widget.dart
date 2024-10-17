@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,7 +16,6 @@ class NodeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool hasChildren = node.children!.isNotEmpty;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,21 +32,15 @@ class NodeWidget extends StatelessWidget {
         ),
         Obx(() {
           if (controller.isChildrenVisible(node.id)) {
-            final children = node.children;
-            return CustomScrollView(
+            final children = node.children!;
+            return ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              slivers: [
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, childIndex) {
-                      final child = children[childIndex];
-                      return NodeWidget(node: child, controller: controller);
-                    },
-                    childCount: children!.length,
-                  ),
-                ),
-              ],
+              itemCount: children.length,
+              itemBuilder: (context, childIndex) {
+                final child = children[childIndex];
+                return NodeWidget(node: child, controller: controller);
+              },
             );
           }
           return const SizedBox.shrink();

@@ -11,7 +11,7 @@ class TractianTile extends StatelessWidget {
   final NodeModel node;
   final TreePageController parentController;
 
-  const TractianTile({required this.node, required this.parentController});
+  TractianTile({required this.node, required this.parentController});
 
   @override
   Widget build(BuildContext context) {
@@ -20,40 +20,46 @@ class TractianTile extends StatelessWidget {
           node: node, parentController: parentController),
       builder: (ctrl) {
         return Obx(() {
-          var hasChildren = ctrl.hasChildren.value;
+          var hasChildren = node.children != null;
+          var isOpen = parentController.isChildrenVisible(node.id);
+          var isChild = ctrl.isChild.value;
+          var isSensor = node.sensorId != null;
 
-          return Stack(
-            children: [
-              Container(
-                color: TractianColor.white,
-                padding: EdgeInsets.only(
-                  left: 12,
-                  top: 6,
-                  bottom: 6.0,
+          return Container(
+            color: TractianColor.white,
+            padding: EdgeInsets.only(
+              left: 12,
+              top: 6,
+              bottom: 6.0,
+            ),
+            child: Row(
+              children: [
+                isSensor
+                    ? const SizedBox.shrink()
+                    : Icon(
+                        hasChildren
+                            ? (isOpen ? Icons.expand_less : Icons.expand_more)
+                            : Icons.expand_less,
+                      ),
+                TractianIconProvider.getIcon(
+                  node.isComponent
+                      ? 'component'
+                      : node.isAsset
+                          ? 'asset'
+                          : 'local',
                 ),
-                child: Row(
-                  children: [
-                    TractianIconProvider.getIcon(
-                      node.isComponent
-                          ? 'component'
-                          : node.isAsset
-                              ? 'asset'
-                              : 'local',
-                    ),
-                    const SizedBox(width: 10.0),
-                    Text(node.name!, style: const TextStyle(fontSize: 22)),
-                    const SizedBox(width: 10.0),
-                    TractianIconProvider.getIcon(
-                      node.sensorType == 'energy'
-                          ? 'energy'
-                          : node.status == 'alert'
-                              ? 'alert'
-                              : 'inactive',
-                    ),
-                  ],
+                const SizedBox(width: 10.0),
+                Text(node.name!, style: const TextStyle(fontSize: 18)),
+                const SizedBox(width: 10.0),
+                TractianIconProvider.getIcon(
+                  node.sensorType == 'energy'
+                      ? 'energy'
+                      : node.status == 'alert'
+                          ? 'alert'
+                          : 'inactive',
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         });
       },

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:get/get.dart';
 import 'package:project_tractian/models/enterprise_model.dart';
 import '../../models/node_model.dart';
@@ -91,6 +93,7 @@ class TreePageController extends GetxController {
   }
 
   bool isChildrenVisible(String? parentId) {
+    if (parentId == null) return false;
     return childrenVisibilityMap[parentId] ?? false;
   }
 }

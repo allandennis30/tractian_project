@@ -20,19 +20,14 @@ class TreePage extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             final items = controller.hierarchyMap.values.toList();
-            return CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final item = items[index];
-                      return NodeWidget(node: item, controller: controller);
-                    },
-                    childCount: items.length,
-                  ),
-                ),
-              ],
-            );
+            return ListView.builder(
+                itemBuilder: (context, index) {
+                  return NodeWidget(
+                    node: items[index],
+                    controller: controller,
+                  );
+                },
+                itemCount: items.length);
           }),
         );
       },
