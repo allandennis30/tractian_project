@@ -12,7 +12,7 @@ class TractianTile extends StatelessWidget {
   final NodeModel node;
   final TreePageController parentController;
 
-  TractianTile({required this.node, required this.parentController});
+  const TractianTile({super.key, required this.node, required this.parentController});
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +36,17 @@ class TractianTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 if (!isRoot)
-                  CustomPaint(
-                    size: Size(2, 30),
-                    painter: TractianLinePainter(
-                      lineType: LineType.fullHeightVertical,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 11),
+                    child: CustomPaint(
+                      size: const Size(2, 30),
+                      painter: TractianLinePainter(
+                        lineType: LineType.fullHeightVertical,
+                      ),
                     ),
                   ),
-                SizedBox(width: node.depth.toDouble() * 20),
-                if (isSensor) SizedBox(width: node.depth.toDouble() * 12),
+                SizedBox(width: node.depth.toDouble() * 18),
+                if (isSensor) SizedBox(width: node.depth.toDouble() * 8),
                 if (!isSensor)
                   Column(
                     children: [
@@ -52,11 +55,11 @@ class TractianTile extends StatelessWidget {
                             ? (isOpen ? Icons.expand_less : Icons.expand_more)
                             : Icons.expand_less,
                       ),
-                      CustomPaint(
+                    /*   CustomPaint(
                         size: const Size(0, 6),
                         painter: TractianLinePainter(
                             lineType: LineType.fullHeightVertical),
-                      ),
+                      ), */
                     ],
                   ),
                 const SizedBox(width: 10.0),
@@ -66,7 +69,7 @@ class TractianTile extends StatelessWidget {
                       : node.isAsset
                           ? 'asset'
                           : 'local',
-                ),
+                )?? const SizedBox.shrink(),
                 const SizedBox(width: 10.0),
                 Flexible(
                   child: Text(
@@ -76,13 +79,14 @@ class TractianTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10.0),
-                TractianIconProvider.getIcon(
-                  node.sensorType == 'energy'
-                      ? 'energy'
-                      : node.status == 'alert'
-                          ? 'alert'
-                          : 'inactive',
-                ),
+               TractianIconProvider.getIcon(
+  node.sensorType == 'energy'
+      ? 'energy'
+      : node.status == 'alert'
+          ? 'alert'
+          : null,
+) ?? const SizedBox.shrink(),
+
               ],
             ),
           );

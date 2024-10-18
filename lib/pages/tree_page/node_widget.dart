@@ -8,7 +8,7 @@ class NodeWidget extends StatelessWidget {
   final NodeModel node;
   final TreePageController controller;
 
-  const NodeWidget({required this.node, required this.controller});
+  const NodeWidget({super.key, required this.node, required this.controller});
 
   @override
   Widget build(BuildContext context) {

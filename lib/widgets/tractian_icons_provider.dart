@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class TractianIconProvider {
-  static Widget getIcon(String iconName,
+  static Widget? getIcon(String? iconName,
       {double width = 22, double height = 22}) {
     switch (iconName) {
       case 'local':
@@ -36,11 +36,7 @@ class TractianIconProvider {
           height: 12,
         );
       default:
-        return const Icon(
-          Icons.help_outline,
-          size: 16.0,
-          color: Colors.black,
-        );
+        return null; // Retorna null ao invés de um ícone padrão
     }
   }
 }
