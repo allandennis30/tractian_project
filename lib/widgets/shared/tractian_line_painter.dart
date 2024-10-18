@@ -20,7 +20,7 @@ class TractianLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = TractianColor.gray
+      ..color = TractianColor.gray200
       ..strokeWidth = 2;
 
     switch (lineType) {

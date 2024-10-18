@@ -12,6 +12,7 @@ class NodeModel {
     this.gatewayId,
     this.sensorId,
     this.depth = 0,
+    this.isVisible = true,
   });
 
   final String? id;
@@ -26,4 +27,5 @@ class NodeModel {
   final String? gatewayId;
   final String? sensorId;
   int depth;
+  bool isVisible;
 }

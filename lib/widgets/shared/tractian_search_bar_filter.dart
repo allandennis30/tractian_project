@@ -6,11 +6,15 @@ class TractianSearchBarFilter extends StatelessWidget {
   const TractianSearchBarFilter({
     super.key,
     this.onChanged,
+    this.onEnergySensorPressed,
+    this.onCriticalPressed,
     this.hintText = 'Buscar Ativo ou Local',
     this.backgroundColor = TractianColor.gray,
   });
 
   final ValueChanged<String>? onChanged;
+  final VoidCallback? onEnergySensorPressed;
+  final VoidCallback? onCriticalPressed;
   final String hintText;
   final Color backgroundColor;
 
@@ -34,9 +38,7 @@ class TractianSearchBarFilter extends StatelessWidget {
               hintText: hintText,
               border: InputBorder.none,
               icon: const Padding(
-                padding: EdgeInsets.only(
-                  left: 18,
-                ),
+                padding: EdgeInsets.only(left: 18),
                 child: Icon(
                   Icons.search,
                   color: TractianColor.gray500,
@@ -54,7 +56,7 @@ class TractianSearchBarFilter extends StatelessWidget {
             TractianButton(
               leftIconPath: 'assets/logo/energy.svg',
               buttonType: ButtonType.small,
-              onPressed: () {},
+              onPressed: onEnergySensorPressed!,
               label: 'Sensor de Energia',
               isToggle: true,
               backgroundColor: Colors.red,
@@ -63,13 +65,13 @@ class TractianSearchBarFilter extends StatelessWidget {
             TractianButton(
               leftIconPath: 'assets/logo/info.svg',
               buttonType: ButtonType.small,
-              onPressed: () {},
+              onPressed: onCriticalPressed!,
               label: 'Crítico',
               isToggle: true,
               backgroundColor: Colors.red,
             ),
           ],
-        )
+        ),
       ],
     );
   }

@@ -10,12 +10,18 @@ class TractianScaffold extends StatelessWidget {
     this.appBarLogoPath,
     required this.body,
     this.showFilter = false,
+    this.onSearchChanged,
+    this.onEnergySensorPressed,
+    this.onCriticalPressed,
   });
 
   final String? appBarTitle;
   final String? appBarLogoPath;
   final Widget body;
   final bool showFilter;
+  final ValueChanged<String>? onSearchChanged;
+  final VoidCallback? onEnergySensorPressed;
+  final VoidCallback? onCriticalPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +65,9 @@ class TractianScaffold extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               child: TractianSearchBarFilter(
-                onChanged: (value) {
-                  print("Texto de pesquisa: $value");
-                },
+                onChanged: onSearchChanged,
+                onEnergySensorPressed: onEnergySensorPressed,
+                onCriticalPressed: onCriticalPressed,
               ),
             ),
           Expanded(child: body),
