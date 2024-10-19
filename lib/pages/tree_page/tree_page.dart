@@ -16,15 +16,16 @@ class TreePage extends StatelessWidget {
       builder: (controller) {
         return TractianScaffold(
           onCriticalPressed: () {
-            log('Energia');
+            controller.filterBySensorType('alert');
           },
           onEnergySensorPressed: () {
-            log('Sensor de Energia');
+            controller.filterBySensorType('energy');
           },
           showFilter: true,
           appBarTitle: 'Assets',
           body: Obx(() {
-            if (controller.hierarchyMap.isEmpty) {
+            var listEmpty = controller.hierarchyMap.isEmpty;
+            if (listEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
             final items = controller.hierarchyMap.values.toList();
@@ -46,44 +47,3 @@ class TreePage extends StatelessWidget {
     );
   }
 }
-
-/* 
-class TreePage extends StatelessWidget {
-  const TreePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GetBuilder<TreePageController>(
-      init: TreePageController(),
-      builder: (controller) {
-        return TractianScaffold(
-          onCriticalPressed: () {
-            log('Energia');
-          },
-          onEnergySensorPressed: () {
-            log('Sensor de Energia');
-          },
-          showFilter: true,
-          appBarTitle: 'Assets',
-          body: Obx(() {
-            if (controller.hierarchyMap.isEmpty) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            //final items = controller.filteredItems;
-            final items = controller.hierarchyMap.values.toList();
-            return ListView.builder(
-                itemBuilder: (context, index) {
-                  return NodeWidget(
-                    node: items[index],
-                    controller: controller,
-                  );
-                },
-                itemCount: items.length);
-          }),
-          onSearchChanged: (value) => controller.search(value),
-        );
-      },
-    );
-  }
-}
- */
