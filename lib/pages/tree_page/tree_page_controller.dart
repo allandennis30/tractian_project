@@ -9,8 +9,13 @@ class TreePageController extends GetxController {
   GeneralRepository generalRepository = GeneralRepository();
   late EnterpriseModel enterpriseModel;
   var hierarchyMap = <String?, NodeModel>{}.obs;
+  var hierarchyMapFilter = <String?, NodeModel>{}.obs;
+  var swicthHierarchyMap = <String?, NodeModel>{}.obs;
   var childrenVisibilityMap = <String, bool>{}.obs;
   var nodesIndex = <String, NodeModel>{}.obs;
+  var filterClicked = [].obs;
+  var filterEnergy = false.obs;
+  var filterCritical = false.obs;
 
   @override
   void onInit() {
@@ -84,43 +89,81 @@ class TreePageController extends GetxController {
     for (final node in nodesIndex.values) {
       addNodeToTreeBFS(node);
     }
+    swicthHierarchyMap = hierarchyMap;
     update();
   }
-  void filterBySensorType(String sensorType) {
-  hierarchyMap.clear(); 
-  int addedCount = 0; 
 
-  for (var node in nodesIndex.values) {
-    
-    if (node.sensorType == sensorType) {
-      log('Adicionando nó do tipo sensor: ${node.name}');
-      _addNodeWithAncestors(node);  
-      addedCount++;
+  void filterButtonClicked(String type) {
+    if (filterClicked.contains(type))
+      filterClicked.remove(type);
+    else
+      filterClicked.add(type);
+
+    if (filterClicked.contains('alert'))
+      filterCritical.value = true;
+    else
+      filterCritical.value = false;
+
+    if (filterClicked.contains('energy'))
+      filterEnergy.value = true;
+    else
+      filterEnergy.value = false;
+
+    if (filterEnergy.value == false && filterCritical.value == false) {
+      swicthHierarchyMap = hierarchyMap;
+      log('filterMap is empty');
+      update();
+      return;
+    } else {
+      swicthHierarchyMap = hierarchyMapFilter;
+      filterNodes(
+        sensorType: filterClicked.contains('energy') ? 'energy' : null,
+        status: filterClicked.contains('alert') ? 'alert' : null,
+      );
     }
   }
 
-  log('Total de nós adicionados: $addedCount'); 
-  update(); 
-}
+  void filterNodes({String? sensorType, String? status}) {
+    hierarchyMapFilter.clear();
+    if (sensorType == null && status == null) {}
+    int addedCount = 0;
 
-void _addNodeWithAncestors(NodeModel node) {
-  
-  if (node.parentId != null) {
-    final parentNode = nodesIndex[node.parentId];
-    if (parentNode != null) {
-      _addNodeWithAncestors(parentNode);  
-      parentNode.children ??= [];
-      if (!parentNode.children!.contains(node)) {
-        parentNode.children!.add(node);
+    for (var node in nodesIndex.values) {
+      if (_shouldAddNode(node, sensorType, status)) {
+        _addNodeWithAncestors(node);
       }
-      node.depth = parentNode.depth + 1;
     }
-  }
-  
-  hierarchyMap[node.id] = node;  
-  _adjustChildrenDepth(node);    
-}
 
+    log('Total de nós adicionados: $addedCount');
+    update();
+  }
+
+  bool _shouldAddNode(NodeModel node, String? sensorType, String? status) {
+    if (sensorType != null && node.sensorType != sensorType) {
+      return false;
+    }
+    if (status != null && node.status != status) {
+      return false;
+    }
+    return true;
+  }
+
+  void _addNodeWithAncestors(NodeModel node) {
+    if (node.parentId != null) {
+      final parentNode = nodesIndex[node.parentId];
+      if (parentNode != null) {
+        _addNodeWithAncestors(parentNode);
+        parentNode.children ??= [];
+        if (!parentNode.children!.contains(node)) {
+          parentNode.children!.add(node);
+        }
+        node.depth = parentNode.depth + 1;
+      }
+    }
+
+    hierarchyMapFilter[node.id] = node;
+    _adjustChildrenDepth(node);
+  }
 
   void addNodeToTreeBFS(NodeModel node) {
     final parentId = node.parentId;
@@ -137,7 +180,6 @@ void _addNodeWithAncestors(NodeModel node) {
       }
     }
   }
-
 
   void _adjustChildrenDepth(NodeModel node) {
     for (var child in node.children!) {
@@ -166,4 +208,3 @@ void _addNodeWithAncestors(NodeModel node) {
     return childrenVisibilityMap[parentId] ?? false;
   }
 }
-

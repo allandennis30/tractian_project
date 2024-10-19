@@ -26,7 +26,6 @@ class TractianTile extends StatelessWidget {
           var isOpen = parentController.isChildrenVisible(node.id);
           var isSensor = node.sensorId != null;
           var isRoot = node.parentId == null;
-          var isAssetWithChildren = node.isAsset && hasChildren;
 
           return Container(
             color: TractianColor.white,
@@ -44,7 +43,7 @@ class TractianTile extends StatelessWidget {
                       lineType: LineType.fullHeightVertical,
                     ),
                   ),
-                SizedBox(width: node.depth.toDouble() * 18),
+                SizedBox(width: node.depth.toDouble() * 10),
                 if (isSensor && isRoot)
                   SizedBox(width: node.depth.toDouble() * 60),
                 if (isSensor && !isRoot)
@@ -81,14 +80,18 @@ class TractianTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10.0),
-                TractianIconProvider.getIcon(
-                      node.sensorType == 'energy'
-                          ? 'energy'
-                          : node.status == 'alert'
-                              ? 'alert'
-                              : null,
-                    ) ??
-                    const SizedBox.shrink(),
+                Row(
+                  children: [
+                    if (node.sensorType == 'energy')
+                      TractianIconProvider.getIcon('energy') ??
+                          const SizedBox.shrink(),
+                    if (node.status == 'alert')
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4.0),
+                        child: TractianIconProvider.getIcon('alert'),
+                      ),
+                  ],
+                ),
               ],
             ),
           );

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:project_tractian/pages/tree_page/tree_page_controller.dart';
@@ -16,10 +14,10 @@ class TreePage extends StatelessWidget {
       builder: (controller) {
         return TractianScaffold(
           onCriticalPressed: () {
-            controller.filterBySensorType('alert');
+            controller.filterButtonClicked('alert');
           },
           onEnergySensorPressed: () {
-            controller.filterBySensorType('energy');
+            controller.filterButtonClicked('energy');
           },
           showFilter: true,
           appBarTitle: 'Assets',
@@ -28,7 +26,7 @@ class TreePage extends StatelessWidget {
             if (listEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
-            final items = controller.hierarchyMap.values.toList();
+            final items = controller.swicthHierarchyMap.values.toList();
             return ListView.builder(
               itemCount: items.length,
               itemBuilder: (context, index) {
