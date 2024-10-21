@@ -138,13 +138,13 @@ void search(String? query) async {
 
 void _filterAddNode(NodeModel node) {
   
-  if (node.parentId == null) {
+  if (node.parentId == null && node.locationId == null) {
     node.depth = 0; 
     hierarchyMap[node.id] = node; 
     hierarchyMapFilter[node.id] = node; 
   } else {
-    
     final parentNode = nodesIndex[node.parentId];
+    
     if (parentNode != null) {
       parentNode.children ??= [];
       if (parentNode.children!.contains(node) == false) {
