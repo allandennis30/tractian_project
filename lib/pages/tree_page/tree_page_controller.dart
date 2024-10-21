@@ -23,35 +23,23 @@ class TreePageController extends GetxController {
     enterpriseModel = Get.arguments as EnterpriseModel;
     fetchData();
   }
-
-  void search(String? query) async {
-    await Future.delayed(const Duration(seconds: 1));
-    final trimmedQuery = query?.toLowerCase() ?? '';
-
-    void updateVisibility(NodeModel node) {
-      bool isVisible = node.name?.toLowerCase().contains(trimmedQuery) == true;
-      node.isVisible = isVisible;
-
-      if (!isVisible && node.children != null) {
-        for (var child in node.children!) {
-          updateVisibility(child);
-        }
-      }
-
-      if (!isVisible &&
-          node.children != null &&
-          node.children!.any((child) => child.isVisible)) {
-        node.isVisible = true;
-        makeChildrenVisibility(node.id);
-      }
-    }
-
-    hierarchyMap.forEach((key, node) {
-      updateVisibility(node);
-    });
-
+void search(String? query) async {
+  if (query == null || query.isEmpty || query.length < 2) {
+    swicthHierarchyMap = hierarchyMap;
     update();
+    return;
   }
+  hierarchyMapFilter.clear();
+  for (var node in nodesIndex.values) {
+    final nodeName = node.name?.toLowerCase() ?? '';
+    if (nodeName.contains(query.toLowerCase()) ) {
+      _filterAddNode(node);  
+    }
+  }
+  swicthHierarchyMap = hierarchyMapFilter;
+  update();
+}
+
 
   Future<void> getLocationsAndAssets() async {
     var fetchedLocations =
@@ -94,20 +82,23 @@ class TreePageController extends GetxController {
   }
 
   void filterButtonClicked(String type) {
-    if (filterClicked.contains(type))
+    if (filterClicked.contains(type)) {
       filterClicked.remove(type);
-    else
+    } else {
       filterClicked.add(type);
+    }
 
-    if (filterClicked.contains('alert'))
+    if (filterClicked.contains('alert')) {
       filterCritical.value = true;
-    else
+    } else {
       filterCritical.value = false;
+    }
 
-    if (filterClicked.contains('energy'))
+    if (filterClicked.contains('energy')) {
       filterEnergy.value = true;
-    else
+    } else {
       filterEnergy.value = false;
+    }
 
     if (filterEnergy.value == false && filterCritical.value == false) {
       swicthHierarchyMap = hierarchyMap;
@@ -126,15 +117,12 @@ class TreePageController extends GetxController {
   void filterNodes({String? sensorType, String? status}) {
     hierarchyMapFilter.clear();
     if (sensorType == null && status == null) {}
-    int addedCount = 0;
 
     for (var node in nodesIndex.values) {
       if (_shouldAddNode(node, sensorType, status)) {
-        _addNodeWithAncestors(node);
+        _filterAddNode(node);
       }
     }
-
-    log('Total de nós adicionados: $addedCount');
     update();
   }
 
@@ -148,22 +136,27 @@ class TreePageController extends GetxController {
     return true;
   }
 
-  void _addNodeWithAncestors(NodeModel node) {
-    if (node.parentId != null) {
-      final parentNode = nodesIndex[node.parentId];
-      if (parentNode != null) {
-        _addNodeWithAncestors(parentNode);
-        parentNode.children ??= [];
-        if (!parentNode.children!.contains(node)) {
-          parentNode.children!.add(node);
-        }
+void _filterAddNode(NodeModel node) {
+  
+  if (node.parentId == null) {
+    node.depth = 0; 
+    hierarchyMap[node.id] = node; 
+    hierarchyMapFilter[node.id] = node; 
+  } else {
+    
+    final parentNode = nodesIndex[node.parentId];
+    if (parentNode != null) {
+      parentNode.children ??= [];
+      if (parentNode.children!.contains(node) == false) {
+        parentNode.children!.add(node);
         node.depth = parentNode.depth + 1;
       }
+      _filterAddNode(parentNode); 
+      hierarchyMapFilter[node.id] = node; 
     }
-
-    hierarchyMapFilter[node.id] = node;
-    _adjustChildrenDepth(node);
   }
+}
+
 
   void addNodeToTreeBFS(NodeModel node) {
     final parentId = node.parentId;
