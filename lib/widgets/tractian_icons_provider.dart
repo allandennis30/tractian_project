@@ -36,7 +36,7 @@ class TractianIconProvider {
           height: 12,
         );
       default:
-        return null; // Retorna null ao invés de um ícone padrão
+        return null;
     }
   }
 }
