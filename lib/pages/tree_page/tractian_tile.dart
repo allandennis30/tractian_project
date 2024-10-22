@@ -29,8 +29,10 @@ class TractianTile extends StatelessWidget {
 
           return Container(
             color: TractianColor.white,
-            padding: const EdgeInsets.only(
+            padding: EdgeInsets.only(
               left: 12,
+              bottom: isRoot ? 8 : 0,
+              top: isRoot ? 8 : 0,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -38,7 +40,7 @@ class TractianTile extends StatelessWidget {
               children: [
                 if (!isRoot)
                   CustomPaint(
-                    size: const Size(23, 30),
+                    size: const Size(23, 38),
                     painter: TractianLinePainter(
                       lineType: LineType.fullHeightVertical,
                     ),
@@ -48,7 +50,7 @@ class TractianTile extends StatelessWidget {
                   SizedBox(width: node.depth.toDouble() * 60),
                 if (isSensor && !isRoot)
                   CustomPaint(
-                      size: const Size(52, 30),
+                      size: const Size(52, 38),
                       painter: TractianLinePainter(
                         lineType: LineType.lShape,
                       )),

@@ -14,6 +14,7 @@ class NodeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     bool hasChildren = node.children!.isNotEmpty;
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(

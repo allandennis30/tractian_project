@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:get/get.dart';
 import 'package:project_tractian/models/enterprise_model.dart';
 import '../../models/node_model.dart';
@@ -23,23 +21,23 @@ class TreePageController extends GetxController {
     enterpriseModel = Get.arguments as EnterpriseModel;
     fetchData();
   }
-void search(String? query) async {
-  if (query == null || query.isEmpty || query.length < 2) {
-    swicthHierarchyMap = hierarchyMap;
-    update();
-    return;
-  }
-  hierarchyMapFilter.clear();
-  for (var node in nodesIndex.values) {
-    final nodeName = node.name?.toLowerCase() ?? '';
-    if (nodeName.contains(query.toLowerCase()) ) {
-      _filterAddNode(node);  
-    }
-  }
-  swicthHierarchyMap = hierarchyMapFilter;
-  update();
-}
 
+  void search(String? query) async {
+    if (query == null || query.isEmpty || query.length < 2) {
+      swicthHierarchyMap = hierarchyMap;
+      update();
+      return;
+    }
+    hierarchyMapFilter.clear();
+    for (var node in nodesIndex.values) {
+      final nodeName = node.name?.toLowerCase() ?? '';
+      if (nodeName.contains(query.toLowerCase())) {
+        _filterAddNode(node);
+      }
+    }
+    swicthHierarchyMap = hierarchyMapFilter;
+    update();
+  }
 
   Future<void> getLocationsAndAssets() async {
     var fetchedLocations =
@@ -82,36 +80,26 @@ void search(String? query) async {
   }
 
   void filterButtonClicked(String type) {
-    if (filterClicked.contains(type)) {
-      filterClicked.remove(type);
-    } else {
+    if (!filterClicked.contains(type)) {
       filterClicked.add(type);
-    }
-
-    if (filterClicked.contains('alert')) {
-      filterCritical.value = true;
     } else {
-      filterCritical.value = false;
+      filterClicked.remove(type);
     }
 
-    if (filterClicked.contains('energy')) {
-      filterEnergy.value = true;
-    } else {
-      filterEnergy.value = false;
-    }
+    filterCritical.value = filterClicked.contains('alert');
+    filterEnergy.value = filterClicked.contains('energy');
 
-    if (filterEnergy.value == false && filterCritical.value == false) {
+    if (!filterEnergy.value && !filterCritical.value) {
       swicthHierarchyMap = hierarchyMap;
-      log('filterMap is empty');
-      update();
-      return;
     } else {
       swicthHierarchyMap = hierarchyMapFilter;
       filterNodes(
-        sensorType: filterClicked.contains('energy') ? 'energy' : null,
-        status: filterClicked.contains('alert') ? 'alert' : null,
+        sensorType: filterEnergy.value ? 'energy' : null,
+        status: filterCritical.value ? 'alert' : null,
       );
     }
+
+    update();
   }
 
   void filterNodes({String? sensorType, String? status}) {
@@ -136,27 +124,24 @@ void search(String? query) async {
     return true;
   }
 
-void _filterAddNode(NodeModel node) {
-  
-  if (node.parentId == null && node.locationId == null) {
-    node.depth = 0; 
-    hierarchyMap[node.id] = node; 
-    hierarchyMapFilter[node.id] = node; 
-  } else {
-    final parentNode = nodesIndex[node.parentId];
-    
-    if (parentNode != null) {
-      parentNode.children ??= [];
-      if (parentNode.children!.contains(node) == false) {
-        parentNode.children!.add(node);
-        node.depth = parentNode.depth + 1;
+  void _filterAddNode(NodeModel node) {
+    if (node.parentId == null && node.locationId == null) {
+      node.depth = 0;
+      hierarchyMap[node.id] = node;
+      hierarchyMapFilter[node.id] = node;
+    } else {
+      final parentNode = nodesIndex[node.parentId];
+      if (parentNode != null) {
+        parentNode.children ??= [];
+        if (parentNode.children!.contains(node) == false) {
+          parentNode.children!.add(node);
+          node.depth = parentNode.depth + 1;
+        }
+        _filterAddNode(parentNode);
+        hierarchyMapFilter[node.id] = node;
       }
-      _filterAddNode(parentNode); 
-      hierarchyMapFilter[node.id] = node; 
     }
   }
-}
-
 
   void addNodeToTreeBFS(NodeModel node) {
     final parentId = node.parentId;
